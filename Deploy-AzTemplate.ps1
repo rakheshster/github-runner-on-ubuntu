@@ -9,9 +9,9 @@ Param(
     [switch] $UploadArtifacts,
     [string] $StorageAccountName,
     [string] $StorageContainerName = $ResourceGroupName.ToLowerInvariant() + '-stageartifacts',
-    [string] $TemplateFile = $ArtifactStagingDirectory + '\azuredeploy.json',
-    [string] $TemplateParametersFile = $ArtifactStagingDirectory + '.\azuredeploy.parameters.json',
-    [string] $DSCSourceFolder = $ArtifactStagingDirectory + '.\DSC',
+    [string] $TemplateFile = $ArtifactStagingDirectory + '/azuredeploy.json',
+    [string] $TemplateParametersFile = $ArtifactStagingDirectory + '/azuredeploy.parameters.json',
+    [string] $DSCSourceFolder = $ArtifactStagingDirectory + '/DSC',
     [switch] $BuildDscPackage,
     [switch] $ValidateOnly,
     [string] $DebugOptions = "None",
@@ -110,14 +110,17 @@ if ($UploadArtifacts -Or $ArtifactsLocationParameter -ne $null) {
 
     # Create a storage account name if none was provided
     if ($StorageAccountName -eq '') {
-        $StorageAccountName = 'stage' + ((Get-AzContext).Subscription.Id).Replace('-', '').substring(0, 19)
+        $StorageAccountName = 'stage' + ((Get-AzContext).Subscription.Id).Replace('-', '').substring(0, 8) + (Get-Random -Maximum 999)
     }
+
+    Write-Host "Storage account name: $StorageAccountName..."
 
     $StorageAccount = (Get-AzStorageAccount | Where-Object { $_.StorageAccountName -eq $StorageAccountName })
 
     # Create the storage account if it doesn't already exist
     if ($StorageAccount -eq $null) {
         $StorageResourceGroupName = 'ARM_Deploy_Staging'
+        Write-Host "Creating Storage account..."
         New-AzResourceGroup -Location "$Location" -Name $StorageResourceGroupName -Force
         $StorageAccount = New-AzStorageAccount -StorageAccountName $StorageAccountName -Type 'Standard_LRS' -ResourceGroupName $StorageResourceGroupName -Location "$Location"
     }
@@ -139,8 +142,10 @@ if ($UploadArtifacts -Or $ArtifactsLocationParameter -ne $null) {
         }
     } 
 
+    Write-Host ($StorageAccount | Out-String)
+
     # Copy files from the local storage staging location to the storage account container
-    New-AzStorageContainer -Name $StorageContainerName -Context $StorageAccount.Context -ErrorAction SilentlyContinue *>&1
+    New-AzStorageContainer -Name $StorageContainerName -Context $StorageAccount.Context # -ErrorAction SilentlyContinue *>&1
 
     $ArtifactFilePaths = Get-ChildItem $ArtifactStagingDirectory -Recurse -File | ForEach-Object -Process { $_.FullName }
     foreach ($SourcePath in $ArtifactFilePaths) {
@@ -151,14 +156,17 @@ if ($UploadArtifacts -Or $ArtifactsLocationParameter -ne $null) {
             Set-AzStorageBlobContent -File $SourcePath -Blob $blobName -Container $StorageContainerName -Context $StorageAccount.Context -Force
         }
     }
-    # Generate a 4 hour SAS token for the artifacts location if one was not provided in the parameters file
+    # Generate a 2 hour SAS token for the artifacts location if one was not provided in the parameters file
     if ($OptionalParameters[$ArtifactsLocationSasTokenName] -eq $null) {
-        $OptionalParameters[$ArtifactsLocationSasTokenName] = (New-AzStorageContainerSASToken -Container $StorageContainerName -Context $StorageAccount.Context -Permission r -ExpiryTime (Get-Date).AddHours(4))
+        $OptionalParameters[$ArtifactsLocationSasTokenName] = (New-AzStorageContainerSASToken -Container $StorageContainerName -Context $StorageAccount.Context -Permission r -ExpiryTime (Get-Date).AddHours(2))
     }
 
     $TemplateArgs.Add('TemplateUri', $ArtifactStagingLocation + (Get-ChildItem $TemplateFile).Name + $OptionalParameters[$ArtifactsLocationSasTokenName])
 
-    $OptionalParameters[$ArtifactsLocationSasTokenName] = ConvertTo-SecureString $OptionalParameters[$ArtifactsLocationSasTokenName] -AsPlainText -Force
+    # When I send a secure string the deployment fails with an error: "Expected 'String, Uri'. Actual 'Object'"
+    # Could be this issue? https://github.com/Azure/azure-powershell/issues/6292
+    # I decided to skip secure string. It's a short lived token anyways. 
+    # $OptionalParameters[$ArtifactsLocationSasTokenName] = ConvertTo-SecureString $OptionalParameters[$ArtifactsLocationSasTokenName] -AsPlainText -Force
 
 }
 else {
@@ -170,7 +178,11 @@ else {
 if(Test-Path $TemplateParametersFile){
     $TemplateArgs.Add('TemplateParameterFile', $TemplateParametersFile)
 }
+
+Write-Host "Template Args:"
 Write-Host ($TemplateArgs | Out-String)
+
+Write-Host "Optional Params:"
 Write-Host ($OptionalParameters | Out-String)
 
 # Create the resource group only when it doesn't already exist - and only in RG scoped deployments

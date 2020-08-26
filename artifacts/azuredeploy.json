@@ -10,14 +10,14 @@
         },
         "adminUsername": {
             "type": "string",
-            "defaultValue": "ghrunner",
+            "defaultValue": "[concat('ghrunner-', substring(uniqueString(resourceGroup().id),0,4))]",
             "metadata": {
                 "description": "Admin username"
             }
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "[concat('ubuntu-runner-', substring(uniqueString(resourceGroup().id),0,3))]",
+            "defaultValue": "[concat('ubuntu-', substring(uniqueString(resourceGroup().id),0,4))]",
             "metadata": {
                 "description": "The name of the Virtual Machine."
             }
@@ -35,6 +35,20 @@
             "metadata": {
                 "description": "Subnet Address Prefix"
             }
+        },
+        "_artifactsLocation": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The base URI where artifacts required by this template are located including a trailing '/'"
+            }
+        },
+        "_artifactsLocationSasToken": {
+            "type": "string",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated. Use the defaultValue if the staging location is not secured."
+            }
         }
     },
     "variables": {
@@ -42,7 +56,7 @@
         "VmSize": "Standard_D4as_v4",
         "location": "[resourceGroup().location]",
         "ubuntuOSVersion": "18.04-LTS",
-        "dnsLabelPrefix": "parameters('vmName')",
+        "dnsLabelPrefix": "[concat(parameters('vmName'), '' )]",
         "virtualNetworkName": "[concat(parameters('vmName'), '-network' )]",
         "networkSecurityGroupName": "[concat(variables('virtualNetworkName'), '-nsg' )]",
         "subnetName": "[concat(parameters('vmName'), '-subnet' )]",
@@ -50,7 +64,7 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-pip' )]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
         "osDiskType": "StandardSSD_LRS",
-        "customData": "[concat('#include\n', uri(parameters('_artifactsgLocation'), concat('Cloud-Init.txt', parameters('_artifactsLocationSasToken'))))]"
+        "customData": "[concat('#include\n', uri(parameters('_artifactsLocation'), concat('cloud-init.txt', parameters('_artifactsLocationSasToken'))))]"
     },
     "resources": [
         {
