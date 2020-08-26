@@ -16,10 +16,11 @@ Param(
     [switch] $ValidateOnly,
     [string] $DebugOptions = "None",
     [string] $Mode = "Incremental",
-    [string] $DeploymentName = ((Split-Path $TemplateFile -LeafBase) + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')),
+    [string] $DeploymentName = ( 'rakdeploy' + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')),
     [switch] $Dev
 )
 
+# (Split-Path $TemplateFile -LeafBase)
 try {
     [Microsoft.Azure.Common.Authentication.AzureSession]::ClientFactory.AddUserAgent("AzQuickStarts-$UI$($host.name)".replace(" ", "_"), "1.0")
 }
