@@ -1,0 +1,9 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "adminKey": {
+        "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC4NySgqP/vSMXuqvgr7eEj2a2XDrNZllgZ4LHNVFvgXAAJQJ6+UOl2Nv5ckl4mLS9Ff6wC+9r4uwgILzpn6OmB/3rfGTjCORx4ed+GZjuJaMAcukVFVRfCLs8UbDalrJXxMajy9L8EF0K1D3VaEXSM1V1tqiU3FXImm9J2dbf+zwPjoyZgjH4JbaZVCjFWDWVdfhcDroEAfFVJyrCEBOerjgSF/9la+Od1HQC90sKPc/ZhW0hUixlns2P88TuY7BQV+CODBgyO/iP30wz8OxhI4NhPSJsLk9npewN6pW4VU7GIpI6tt14nZzW4237Vbq6LJdyoytJbVXvIBq5cy16ZR29xP3e81W08oDdAMQ6YhpX9G9ZRcal9jQsMldKe1bFGCw9XT3+wKN7okeAjV8is4tTelnlu9cUT5TwKqauMGd33XhjGjlyh00CLLbqsHJhQTc72e+ZqW7HiS+/dcbX1lHib5PRjosmejHPX64kfe9hwN9gN7b+gnYhJqLwp/QM= rakhesh@imc"
+      }
+    }
+}  
