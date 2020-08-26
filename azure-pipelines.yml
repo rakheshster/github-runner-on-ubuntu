@@ -7,5 +7,5 @@ steps:
   inputs:
     azureSubscription: 'azure-free-trial1'
     ScriptPath: 'Deploy-AzTemplate.ps1'
-    ScriptArguments: -ResourceGroupName 'ghrunner' -ResourceGroupLocation 'uksouth'
+    ScriptArguments: -ResourceGroupLocation 'uksouth' -ArtifactStagingDirectory artifacts
     azurePowerShellVersion: LatestVersion
