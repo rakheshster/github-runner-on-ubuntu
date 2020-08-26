@@ -1,7 +1,10 @@
-pool:
-  name: Hosted Windows 2019 with VS2019
-  demands: azureps
+# pool:
+#   name: Hosted Windows 2019 with VS2019
+#   demands: azureps
 
+pool:
+  vmImage: 'ubuntu-latest'
+  
 steps:
 - task: AzurePowerShell@4
   inputs:
