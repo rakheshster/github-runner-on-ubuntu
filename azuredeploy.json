@@ -2,6 +2,19 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "adminKey": {
+            "type": "securestring",
+            "metadata": {
+                "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+            }
+        },
+        "adminUsername": {
+            "type": "string",
+            "defaultValue": "ghrunner",
+            "metadata": {
+                "description": "Admin username"
+            }
+        },
         "vmName": {
             "type": "string",
             "defaultValue": "[concat('ubuntu-runner-', substring(uniqueString(resourceGroup().id),0,3))]",
@@ -9,80 +22,45 @@
                 "description": "The name of the Virtual Machine."
             }
         },
-        "adminUsername": {
+        "subnetAddressPrefix": {
             "type": "string",
+            "defaultValue": "10.1.0.0/24",
             "metadata": {
-                "description": "Username for the Virtual Machine."
+                "description": "Network Address Prefix"
             }
         },
-        "adminPasswordOrKey": {
-            "type": "securestring",
-            "metadata": {
-                "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
-            }
-        },
-        "dnsLabelPrefix": {
+        "addressPrefix": {
             "type": "string",
-            "defaultValue": "[toLower(concat('simplelinuxvm-', uniqueString(resourceGroup().id)))]",
+            "defaultValue": "10.1.0.0/16",
             "metadata": {
-                "description": "Unique DNS Name for the Public IP used to access the Virtual Machine."
-            }
-        },
-        "virtualNetworkName": {
-            "type": "string",
-            "defaultValue": "vNet",
-            "metadata": {
-                "description": "Name of the VNET"
-            }
-        },
-        "subnetName": {
-            "type": "string",
-            "defaultValue": "Subnet",
-            "metadata": {
-                "description": "Name of the subnet in the virtual network"
-            }
-        },
-        "networkSecurityGroupName": {
-            "type": "string",
-            "defaultValue": "SecGroupNet",
-            "metadata": {
-                "description": "Name of the Network Security Group"
+                "description": "Subnet Address Prefix"
             }
         }
     },
     "variables": {
-        "publicIpAddressName": "[concat(parameters('vmName'), 'PublicIP' )]",
-        "authenticationType": "sshPublicKey",
-        "ubuntuOSVersion": "18.04-LTS",
         // https://docs.microsoft.com/en-us/azure/virtual-machines/acu might be helpful for a comparison
         "VmSize": "Standard_D4as_v4",
         "location": "[resourceGroup().location]",
-        "networkInterfaceName": "[concat(parameters('vmName'),'NetInt')]",
-        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworkName'), parameters('subnetName'))]",
-        "osDiskType": "Standard_LRS",
-        "subnetAddressPrefix": "10.1.0.0/24",
-        "addressPrefix": "10.1.0.0/16",
-        "linuxConfiguration": {
-            "disablePasswordAuthentication": true,
-            "ssh": {
-                "publicKeys": [
-                    {
-                        "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
-                        "keyData": "[parameters('adminPasswordOrKey')]"
-                    }
-                ]
-            }
-        }
+        "ubuntuOSVersion": "18.04-LTS",
+        "dnsLabelPrefix": "parameters('vmName')",
+        "virtualNetworkName": "[concat(parameters('vmName'), '-network' )]",
+        "networkSecurityGroupName": "[concat(variables('virtualNetworkName'), '-nsg' )]",
+        "subnetName": "[concat(parameters('vmName'), '-subnet' )]",
+        "networkInterfaceName": "[concat(parameters('vmName'),'-nic')]",
+        "publicIpAddressName": "[concat(parameters('vmName'), '-pip' )]",
+        "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
+        "osDiskType": "StandardSSD_LRS",
+        "customData": "[concat('#include\n', uri(parameters('_artifactsgLocation'), concat('Cloud-Init.txt', parameters('_artifactsLocationSasToken'))))]"
     },
     "resources": [
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2018-10-01",
             "name": "[variables('networkInterfaceName')]",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkSecurityGroups/', parameters('networkSecurityGroupName'))]",
-                "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetworkName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups/', variables('networkSecurityGroupName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks/', variables('virtualNetworkName'))]",
                 "[resourceId('Microsoft.Network/publicIpAddresses/', variables('publicIpAddressName'))]"
             ],
             "properties": {
@@ -101,15 +79,15 @@
                     }
                 ],
                 "networkSecurityGroup": {
-                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',parameters('networkSecurityGroupName'))]"
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups',variables('networkSecurityGroupName'))]"
                 }
             }
         },
         {
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-02-01",
-            "name": "[parameters('networkSecurityGroupName')]",
-            "location": "[parameters('location')]",
+            "name": "[variables('networkSecurityGroupName')]",
+            "location": "[variables('location')]",
             "properties": {
                 "securityRules": [
                     {
@@ -131,19 +109,19 @@
         {
             "type": "Microsoft.Network/virtualNetworks",
             "apiVersion": "2019-04-01",
-            "name": "[parameters('virtualNetworkName')]",
-            "location": "[parameters('location')]",
+            "name": "[variables('virtualNetworkName')]",
+            "location": "[variables('location')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[variables('addressPrefix')]"
+                        "[parameters('addressPrefix')]"
                     ]
                 },
                 "subnets": [
                     {
-                        "name": "[parameters('subnetName')]",
+                        "name": "[variables('subnetName')]",
                         "properties": {
-                            "addressPrefix": "[variables('subnetAddressPrefix')]",
+                            "addressPrefix": "[parameters('subnetAddressPrefix')]",
                             "privateEndpointNetworkPolicies": "Enabled",
                             "privateLinkServiceNetworkPolicies": "Enabled"
                         }
@@ -153,14 +131,14 @@
         },
         {
             "type": "Microsoft.Network/publicIpAddresses",
-            "apiVersion": "2019-02-01",
+            "apiVersion": "2020-05-01",
             "name": "[variables('publicIpAddressName')]",
-            "location": "[parameters('location')]",
+            "location": "[variables('location')]",
             "properties": {
                 "publicIpAllocationMethod": "Dynamic",
                 "publicIPAddressVersion": "IPv4",
                 "dnsSettings": {
-                    "domainNameLabel": "[parameters('dnsLabelPrefix')]"
+                    "domainNameLabel": "[variables('dnsLabelPrefix')]"
                 },
                 "idleTimeoutInMinutes": 4
             },
@@ -179,7 +157,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('VmSize')]"
+                    "vmSize": "[variables('VmSize')]"
                 },
                 "storageProfile": {
                     "osDisk": {
@@ -191,7 +169,7 @@
                     "imageReference": {
                         "publisher": "Canonical",
                         "offer": "UbuntuServer",
-                        "sku": "[parameters('ubuntuOSVersion')]",
+                        "sku": "[variables('ubuntuOSVersion')]",
                         "version": "latest"
                     }
                 },
@@ -205,8 +183,18 @@
                 "osProfile": {
                     "computerName": "[parameters('vmName')]",
                     "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPasswordOrKey')]",
-                    "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), json('null'), variables('linuxConfiguration'))]"
+                    "adminPassword": "[parameters('adminKey')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('adminKey')]"
+                                }
+                            ]
+                        }
+                    }
                 }
             }
         }
