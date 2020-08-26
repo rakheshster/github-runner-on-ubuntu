@@ -1,0 +1,11 @@
+pool:
+  name: Hosted Windows 2019 with VS2019
+  demands: azureps
+
+steps:
+- task: AzurePowerShell@4
+  inputs:
+    azureSubscription: 'Free Trial 1'
+    ScriptPath: 'Deploy-AzureResourceGroup.ps1'
+    ScriptArguments: -ResourceGroupName 'ghrunner' -ResourceGroupLocation 'uksouth'
+    azurePowerShellVersion: LatestVersion
