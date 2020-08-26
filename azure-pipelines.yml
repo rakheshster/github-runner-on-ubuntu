@@ -6,6 +6,6 @@ steps:
 - task: AzurePowerShell@4
   inputs:
     azureSubscription: 'Free Trial 1'
-    ScriptPath: 'github-runner-on-ubuntu/Deploy-AzureResourceGroup.ps1'
-    ScriptArguments: -ResourceGroupName 'demogroup' -ResourceGroupLocation 'centralus'
+    ScriptPath: 'Deploy-AzureResourceGroup.ps1'
+    ScriptArguments: -ResourceGroupName 'ghrunner' -ResourceGroupLocation 'uksouth'
     azurePowerShellVersion: LatestVersion
