@@ -1,0 +1,11 @@
+pool:
+  name: Hosted Windows 2019 with VS2019
+  demands: azureps
+
+steps:
+- task: AzurePowerShell@4
+  inputs:
+    azureSubscription: 'Free Trial 1'
+    ScriptPath: 'github-runner-on-ubuntu/Deploy-AzureResourceGroup.ps1'
+    ScriptArguments: -ResourceGroupName 'demogroup' -ResourceGroupLocation 'centralus'
+    azurePowerShellVersion: LatestVersion
