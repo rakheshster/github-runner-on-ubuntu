@@ -16,11 +16,10 @@ Param(
     [switch] $ValidateOnly,
     [string] $DebugOptions = "None",
     [string] $Mode = "Incremental",
-    [string] $DeploymentName = ( 'rakdeploy' + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')),
+    [string] $DeploymentName = ( (Split-Path $TemplateFile -LeafBase) + '-' + ((Get-Date).ToUniversalTime()).ToString('MMdd-HHmm')),
     [switch] $Dev
 )
 
-# (Split-Path $TemplateFile -LeafBase)
 try {
     [Microsoft.Azure.Common.Authentication.AzureSession]::ClientFactory.AddUserAgent("AzQuickStarts-$UI$($host.name)".replace(" ", "_"), "1.0")
 }
@@ -44,7 +43,7 @@ if (!(Test-Path $TemplateFile)) {
     $TemplateFile = $ArtifactStagingDirectory + '\azuredeploy.json'
 }
 
-Write-Host "Using template file:  $TemplateFile"
+#Write-Host "Using template file:  $TemplateFile"
 
 #try a few different default options for param files when the -dev switch is use
 if ($Dev) {
@@ -143,7 +142,7 @@ if ($UploadArtifacts -Or $ArtifactsLocationParameter -ne $null) {
         }
     } 
 
-    Write-Host ($StorageAccount | Out-String)
+    #Write-Host ($StorageAccount | Out-String)
 
     # Copy files from the local storage staging location to the storage account container
     New-AzStorageContainer -Name $StorageContainerName -Context $StorageAccount.Context # -ErrorAction SilentlyContinue *>&1
@@ -164,7 +163,7 @@ if ($UploadArtifacts -Or $ArtifactsLocationParameter -ne $null) {
 
     $TemplateArgs.Add('TemplateUri', $ArtifactStagingLocation + (Get-ChildItem $TemplateFile).Name + $OptionalParameters[$ArtifactsLocationSasTokenName])
 
-    # When I send a secure string the deployment fails with an error: "Expected 'String, Uri'. Actual 'Object'"
+    # When I send a secure string the deployment fails with an error: "Expected 'String, Uri'. Actual 'Object'" (this was on macOS, so PowerShell Core)
     # Could be this issue? https://github.com/Azure/azure-powershell/issues/6292
     # I decided to skip secure string. It's a short lived token anyways. 
     # $OptionalParameters[$ArtifactsLocationSasTokenName] = ConvertTo-SecureString $OptionalParameters[$ArtifactsLocationSasTokenName] -AsPlainText -Force
@@ -180,11 +179,11 @@ if(Test-Path $TemplateParametersFile){
     $TemplateArgs.Add('TemplateParameterFile', $TemplateParametersFile)
 }
 
-Write-Host "Template Args:"
-Write-Host ($TemplateArgs | Out-String)
+#Write-Host "Template Args:"
+#Write-Host ($TemplateArgs | Out-String)
 
-Write-Host "Optional Params:"
-Write-Host ($OptionalParameters | Out-String)
+#Write-Host "Optional Params:"
+#Write-Host ($OptionalParameters | Out-String)
 
 # Create the resource group only when it doesn't already exist - and only in RG scoped deployments
 if ($deploymentScope -eq "ResourceGroup") {

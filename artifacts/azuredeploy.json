@@ -64,6 +64,7 @@
         "publicIpAddressName": "[concat(parameters('vmName'), '-pip' )]",
         "subnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('virtualNetworkName'), variables('subnetName'))]",
         "osDiskType": "StandardSSD_LRS",
+        // hat tip: https://www.wintellect.com/arm-templates-and-cloud-init/
         "customData": "[concat('#include\n', uri(parameters('_artifactsLocation'), concat('cloud-init.txt', parameters('_artifactsLocationSasToken'))))]"
     },
     "resources": [
@@ -198,6 +199,8 @@
                     "computerName": "[parameters('vmName')]",
                     "adminUsername": "[parameters('adminUsername')]",
                     "adminPassword": "[parameters('adminKey')]",
+                    // hat tip: https://www.wintellect.com/arm-templates-and-cloud-init/
+                    "customData": "[base64(variables('customData'))]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {

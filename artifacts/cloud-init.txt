@@ -3,7 +3,7 @@ package_update: true
 packages: 
   - curl
 runcmd:
-  - mkdir actions-runner && cd actions-runner
+  - mkdir /tmp/actions-runner && cd /tmp/actions-runner
   - curl -O -L https://github.com/actions/runner/releases/download/v2.273.0/actions-runner-linux-x64-2.273.0.tar.gz
   - tar xzf ./actions-runner-linux-x64-2.273.0.tar.gz
   - cd actions-runner-linux-x64-2.273.0

@@ -4,7 +4,10 @@
 
 pool:
   vmImage: 'ubuntu-latest'
-  
+
+# I'd like to run this manually
+trigger: none
+
 steps:
 - task: AzurePowerShell@4
   inputs:
