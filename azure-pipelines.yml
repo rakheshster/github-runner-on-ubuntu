@@ -6,6 +6,6 @@ steps:
 - task: AzurePowerShell@4
   inputs:
     azureSubscription: 'azure-free-trial1'
-    ScriptPath: 'Deploy-AzureResourceGroup.ps1'
+    ScriptPath: 'Deploy-AzTemplate.ps1'
     ScriptArguments: -ResourceGroupName 'ghrunner' -ResourceGroupLocation 'uksouth'
     azurePowerShellVersion: LatestVersion
