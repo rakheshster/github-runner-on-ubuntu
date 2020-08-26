@@ -5,7 +5,7 @@ pool:
 steps:
 - task: AzurePowerShell@4
   inputs:
-    azureSubscription: 'Free Trial 1'
+    azureSubscription: 'azure-free-trial1'
     ScriptPath: 'Deploy-AzureResourceGroup.ps1'
     ScriptArguments: -ResourceGroupName 'ghrunner' -ResourceGroupLocation 'uksouth'
     azurePowerShellVersion: LatestVersion
