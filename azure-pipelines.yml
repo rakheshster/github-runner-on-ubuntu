@@ -19,5 +19,5 @@ steps:
   inputs:
     azureSubscription: 'azure-free-trial1'
     ScriptPath: 'Deploy-AzTemplate.ps1'
-    ScriptArguments: -ResourceGroupLocation 'eastus' -ArtifactStagingDirectory 'artifacts' -ResourceGroupName 'ghrunner' -DeploymentName $(Build.BuildNumber)
+    ScriptArguments: -ResourceGroupLocation 'eastus' -ArtifactStagingDirectory 'artifacts' -ResourceGroupName $(RESOURCEGROUP) -DeploymentName $(Build.BuildNumber)
     azurePowerShellVersion: LatestVersion
