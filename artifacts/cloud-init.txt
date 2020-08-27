@@ -1,10 +1,15 @@
 #cloud-config:
-package_update: true
+package_upgrade: true
 packages: 
   - curl
+  - zlib1g
+  - libssl1.1
+  - libicu60
+  - libkrb5-3
+  - liblttng-ust-ctl4 
+  - liblttng-ust0 
+  - liburcu6
 runcmd:
   - mkdir /tmp/actions-runner && cd /tmp/actions-runner
-#  - curl -O -L https://github.com/actions/runner/releases/download/v2.273.0/actions-runner-linux-x64-2.273.0.tar.gz
-#  - tar xzf ./actions-runner-linux-x64-2.273.0.tar.gz
-#  - cd actions-runner-linux-x64-2.273.0
-#  - ./bin/installdependencies.sh
+  - curl -O -L https://github.com/actions/runner/releases/download/v2.273.0/actions-runner-linux-x64-2.273.0.tar.gz
+  - tar xzf ./actions-runner-linux-x64-2.273.0.tar.gz
