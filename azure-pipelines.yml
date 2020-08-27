@@ -9,6 +9,12 @@ pool:
 trigger: none
 
 steps:
+- script: sed -i 's/REPLACETOKEN/$TOKEN/g; s/REPLACEREPO/$REPO/g' artifacts/cloud-init.txt
+  env:
+    # map the secret token
+    TOKEN: $(TOKEN)
+    # this is not needed but I am explicitly mapping it
+    REPO: $(REPO)
 - task: AzurePowerShell@4
   inputs:
     azureSubscription: 'azure-free-trial1'
