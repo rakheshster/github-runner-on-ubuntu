@@ -145,7 +145,7 @@ if ($UploadArtifacts -Or $ArtifactsLocationParameter -ne $null) {
     #Write-Host ($StorageAccount | Out-String)
 
     # Copy files from the local storage staging location to the storage account container
-    New-AzStorageContainer -Name $StorageContainerName -Context $StorageAccount.Context # -ErrorAction SilentlyContinue *>&1
+    New-AzStorageContainer -Name $StorageContainerName -Context $StorageAccount.Context -ErrorAction SilentlyContinue *>&1
 
     $ArtifactFilePaths = Get-ChildItem $ArtifactStagingDirectory -Recurse -File | ForEach-Object -Process { $_.FullName }
     foreach ($SourcePath in $ArtifactFilePaths) {

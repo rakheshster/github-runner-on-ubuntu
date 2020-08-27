@@ -5,19 +5,19 @@
         "adminKey": {
             "type": "securestring",
             "metadata": {
-                "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+                "description": "SSH Key."
             }
         },
         "adminUsername": {
             "type": "string",
-            "defaultValue": "[concat('ghrunner-', substring(uniqueString(resourceGroup().id),0,4))]",
+            "defaultValue": "[concat('ghrunner-', substring(uniqueString(resourceGroup().id),0,6))]",
             "metadata": {
                 "description": "Admin username"
             }
         },
         "vmName": {
             "type": "string",
-            "defaultValue": "[concat('ubuntu-', substring(uniqueString(resourceGroup().id),0,4))]",
+            "defaultValue": "[concat('ghrunner-', substring(uniqueString(resourceGroup().id),0,6))]",
             "metadata": {
                 "description": "The name of the Virtual Machine."
             }
@@ -34,6 +34,13 @@
             "defaultValue": "10.1.0.0/16",
             "metadata": {
                 "description": "Subnet Address Prefix"
+            }
+        },
+        "diskSizeGB": {
+            "type": "int",
+            "defaultValue": 50,
+            "metadata": {
+                "description": "Size of the OS disk" 
             }
         },
         "_artifactsLocation": {
@@ -177,6 +184,7 @@
                 "storageProfile": {
                     "osDisk": {
                         "createOption": "fromImage",
+                        "diskSizeGB": "[parameters('diskSizeGB')]",
                         "managedDisk": {
                             "storageAccountType": "[variables('osDiskType')]"
                         }
