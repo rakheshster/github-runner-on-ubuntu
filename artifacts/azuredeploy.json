@@ -8,13 +8,6 @@
                 "description": "SSH Key."
             }
         },
-        "adminUsername": {
-            "type": "string",
-            "defaultValue": "[concat('ghrunner-', substring(uniqueString(resourceGroup().id),0,6))]",
-            "metadata": {
-                "description": "Admin username"
-            }
-        },
         "vmName": {
             "type": "string",
             "defaultValue": "[concat('ghrunner-', substring(uniqueString(resourceGroup().id),0,6))]",
@@ -61,6 +54,7 @@
     "variables": {
         // https://docs.microsoft.com/en-us/azure/virtual-machines/acu might be helpful for a comparison
         "VmSize": "Standard_D4as_v4",
+        "adminUsername": "ghrunner",
         "location": "[resourceGroup().location]",
         "ubuntuOSVersion": "18.04-LTS",
         "dnsLabelPrefix": "[concat(parameters('vmName'), '' )]",
@@ -205,7 +199,7 @@
                 },
                 "osProfile": {
                     "computerName": "[parameters('vmName')]",
-                    "adminUsername": "[parameters('adminUsername')]",
+                    "adminUsername": "[variables('adminUsername')]",
                     "adminPassword": "[parameters('adminKey')]",
                     // hat tip: https://www.wintellect.com/arm-templates-and-cloud-init/
                     "customData": "[base64(variables('customData'))]",
@@ -214,7 +208,7 @@
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', variables('adminUsername'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('adminKey')]"
                                 }
                             ]
@@ -227,7 +221,7 @@
     "outputs": {
         "adminUsername": {
             "type": "string",
-            "value": "[parameters('adminUsername')]"
+            "value": "[variables('adminUsername')]"
         },
         "hostname": {
             "type": "string",
@@ -235,7 +229,7 @@
         },
         "sshCommand": {
             "type": "string",
-            "value": "[concat('ssh ', parameters('adminUsername'), '@', reference(variables('publicIPAddressName')).dnsSettings.fqdn)]"
+            "value": "[concat('ssh ', variables('adminUsername'), '@', reference(variables('publicIPAddressName')).dnsSettings.fqdn)]"
         }
     }
 }
