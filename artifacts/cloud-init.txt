@@ -10,5 +10,8 @@ packages:
   - liblttng-ust0 
   - liburcu6
 runcmd:
-  - mkdir /tmp/actions-runner && cd /tmp/actions-runner
+  - mkdir /tmp/actions-runner && cd /tmp/actions-runner && chmod go+wx actions-runner
   - curl -O -L https://github.com/actions/runner/releases/download/v2.273.0/actions-runner-linux-x64-2.273.0.tar.gz
+  - tar xzf ./actions-runner-linux-x64-2.273.0
+  - ./config.sh --url REPLACEREPO --token REPLACETOKEN --unattended
+  - ./run.sh --unattended
