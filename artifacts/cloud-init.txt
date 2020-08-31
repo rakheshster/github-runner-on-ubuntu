@@ -3,7 +3,7 @@ package_update: true
 package_upgrade: true
 
 packages: 
-  # == Required for GitHub runner ==
+  # Required for GitHub runner 
   - zlib1g
   - libssl1.1
   - libicu60
@@ -11,17 +11,17 @@ packages:
   - liblttng-ust-ctl4 
   - liblttng-ust0 
   - liburcu6
-  # == Required for Docker ==
+  # Required for Docker 
   - apt-transport-https
   - ca-certificates
   - curl
   - gnupg-agent
   - software-properties-common
-  # == Required for the token extraction below ==
+  # Required for the token extraction below 
   - jq
 
 runcmd:
-  # == Steps for Docker ==
+  # Steps for Docker 
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
   - add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   - apt-get -y update 
@@ -30,15 +30,15 @@ runcmd:
   - systemctl enable docker
   # I don't need to add this user to the group but I will just in case I ssh in for troubleshooting something
   - usermod -a -G docker ghrunner
-  # == Steps for GitHub runner ==
+  # Steps for GitHub runner 
   - mkdir /tmp/actions-runner 
   # I don't need to do this any more as I am running the runner as root. If I change my mind uncomment this bit. 
   # - chown ghrunner /tmp/actions-runner 
   - cd /tmp/actions-runner
   # Thanks to https://developer.github.com/v3/actions/self-hosted-runners/ for the GitHub API stuff
-  - RUNNERTOKEN=$(curl -s -XPOST -H "authorization: token _REPLACETOKEN_" https://api.github.com/repos/_REPLACEREPO_/actions/runners/registration-token | jq -r '.token')
+  - RUNNERTOKEN=$(curl -s -XPOST -H "authorization: token _REPLACETOKEN_" https://api.github.com/repos/_REPLACEREPO_/actions/runners/registration-token | jq -r .token)
   - curl -O -L https://github.com/actions/runner/releases/download/v_REPLACEVER_/actions-runner-linux-x64-_REPLACEVER_.tar.gz
-  - tar xzf ./actions-runner-linux-x64-REPLACEVER.tar.gz
+  - tar xzf ./actions-runner-linux-x64-_REPLACEVER_.tar.gz
   # I need to put RUNNER_ALLOW_RUNASROOT=1 to allow the below to run as root (because that's what happens since the runner is configured & run as part of cloud-init)
   # The ghrunner user is not really used except for me to SSH into it if needed
   - RUNNER_ALLOW_RUNASROOT=1 ./config.sh --url https://github.com/_REPLACEREPO_ --token $RUNNERTOKEN --unattended
