@@ -36,7 +36,7 @@ runcmd:
   # - chown ghrunner /tmp/actions-runner 
   - cd /tmp/actions-runner
   # Thanks to https://developer.github.com/v3/actions/self-hosted-runners/ for the GitHub API stuff
-  - RUNNERTOKEN=$(curl -s -XPOST -H "authorization: token _REPLACETOKEN_" https://api.github.com/repos/_REPLACEREPO_/actions/runners/registration-token | jq -r .token)
+  - 'RUNNERTOKEN=$(curl -s -XPOST -H "authorization: token _REPLACETOKEN_" https://api.github.com/repos/_REPLACEREPO_/actions/runners/registration-token | jq -r .token)'
   - curl -O -L https://github.com/actions/runner/releases/download/v_REPLACEVER_/actions-runner-linux-x64-_REPLACEVER_.tar.gz
   - tar xzf ./actions-runner-linux-x64-_REPLACEVER_.tar.gz
   # I need to put RUNNER_ALLOW_RUNASROOT=1 to allow the below to run as root (because that's what happens since the runner is configured & run as part of cloud-init)
