@@ -9,7 +9,7 @@ pool:
 trigger: none
 
 steps:
-- script: sed -i "s|REPLACETOKEN|$TOKEN|g; s|REPLACEREPO|$REPO|g; s|REPLACEVER|$RUNNER_VER|g" artifacts/cloud-init.txt
+- script: sed -i "s|_REPLACETOKEN_|$TOKEN|g; s|_REPLACEREPO_|$REPO|g; s|_REPLACEVER_|$RUNNER_VER|g" artifacts/cloud-init.txt
   env:
     # The secret token needs explicit mapping. The others, not, but I am mapping them anyways so it's clear. 
     TOKEN: $(TOKEN)
