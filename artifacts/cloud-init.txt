@@ -46,6 +46,6 @@ runcmd:
   - RUNNER_ALLOW_RUNASROOT=1 ./config.sh --url https://github.com/_REPLACEREPO_ --token $RUNNERTOKEN --unattended
   # I used to run the runner immediately but now I want to make it a service so I can reuse the VM and cache later
   # - RUNNER_ALLOW_RUNASROOT=1 ./run.sh --unattended
-  - ./svc.sh install 
-  - ./svc.sh start
-  - ./svc.sh status
+  - RUNNER_ALLOW_RUNASROOT=1 ./svc.sh install 
+  - RUNNER_ALLOW_RUNASROOT=1 ./svc.sh start
+  - RUNNER_ALLOW_RUNASROOT=1 ./svc.sh status
