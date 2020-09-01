@@ -30,12 +30,10 @@ runcmd:
   - systemctl enable docker
   # I don't need to add this user to the group but I will just in case I ssh in for troubleshooting something
   - usermod -a -G docker ghrunner
-  # creating a build-cache folder so I can use it later in my workflows. I don't need to do this as the workflow creates it automatically I think. 
+  # Creating a build-cache folder so I can use it later in my workflows. I don't need to do this as the workflow creates it automatically but I like to be explicit.
   - mkdir /build-cache 
   # Steps for GitHub runner 
-  - mkdir /actions-runner 
-  # I don't need to do this any more as I am running the runner as root. If I change my mind uncomment this bit. 
-  # - chown ghrunner /actions-runner 
+  - mkdir /actions-runner
   - cd /actions-runner
   # Thanks to https://developer.github.com/v3/actions/self-hosted-runners/ for the GitHub API stuff
   - 'RUNNERTOKEN=$(curl -s -XPOST -H "authorization: token _REPLACETOKEN_" https://api.github.com/repos/_REPLACEREPO_/actions/runners/registration-token | jq -r .token)'
@@ -49,3 +47,4 @@ runcmd:
   - RUNNER_ALLOW_RUNASROOT=1 ./svc.sh install 
   - RUNNER_ALLOW_RUNASROOT=1 ./svc.sh start
   - RUNNER_ALLOW_RUNASROOT=1 ./svc.sh status
+  - chown ghrunner /actions-runner 
