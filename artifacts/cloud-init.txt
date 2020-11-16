@@ -48,3 +48,5 @@ runcmd:
   - RUNNER_ALLOW_RUNASROOT=1 ./svc.sh start
   - RUNNER_ALLOW_RUNASROOT=1 ./svc.sh status
   - chown -R ghrunner /actions-runner 
+  - mkdir /build-cache
+  - chown -R ghrunner /build-cache
