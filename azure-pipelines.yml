@@ -15,9 +15,10 @@ steps:
     TOKEN: $(TOKEN)
     REPO: $(REPO)
     RUNNER_VER: $(RUNNER_VER)
+    AZ_CONNECTION: $(AZ_CONNECTION)
 - task: AzurePowerShell@4
   inputs:
-    azureSubscription: 'Free-Trial-1'
+    azureSubscription: $(AZ_CONNECTION)
     ScriptPath: 'Deploy-AzTemplate.ps1'
     ScriptArguments: -ResourceGroupLocation 'eastus' -ArtifactStagingDirectory 'artifacts' -ResourceGroupName $(RESOURCEGROUP) -DeploymentName $(Build.BuildNumber)
     azurePowerShellVersion: LatestVersion
