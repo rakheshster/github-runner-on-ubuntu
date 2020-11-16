@@ -17,7 +17,7 @@ steps:
     RUNNER_VER: $(RUNNER_VER)
 - task: AzurePowerShell@4
   inputs:
-    azureSubscription: 'azure-free-trial1'
+    azureSubscription: 'Free-Trial-1'
     ScriptPath: 'Deploy-AzTemplate.ps1'
     ScriptArguments: -ResourceGroupLocation 'eastus' -ArtifactStagingDirectory 'artifacts' -ResourceGroupName $(RESOURCEGROUP) -DeploymentName $(Build.BuildNumber)
     azurePowerShellVersion: LatestVersion
