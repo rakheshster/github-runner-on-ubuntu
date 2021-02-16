@@ -1,6 +1,6 @@
 # What is this?
 
-[![Build Status](https://dev.azure.com/rakheshster/Azure%20Build/_apis/build/status/rakheshster.github-runner-on-ubuntu?branchName=master)](https://dev.azure.com/rakheshster/Azure%20Build/_build/latest?definitionId=2&branchName=master)
+[![Build Status](https://dev.azure.com/rakheshster/Azure%20Build/_apis/build/status/rakheshster.github-runner-on-ubuntu?branchName=master)](https://dev.azure.com/rakheshster/Azure%20Build/_build/latest?definitionId=2&branchName=master) [![awesome-runners](https://img.shields.io/badge/listed%20on-awesome--runners-blue.svg)](https://github.com/jonico/awesome-runners)
 
 This is an ARM template that will create a self-hosted Linux x64 (currently Ubuntu 18.04, soon to be 20.04) GitHub runner on Azure. You don't need to register the runner against your repo. The pipeline will automatically do so. 
 
